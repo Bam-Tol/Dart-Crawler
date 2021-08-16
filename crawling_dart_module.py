@@ -7,11 +7,16 @@ Created on Fri Feb 19 14:28:36 2021
 
 import requests
 import pandas as pd
+import numpy as np
 import re
 from bs4 import BeautifulSoup
 import time
 import copy
 from html_table_parser import parser_functions as parser
+from io import BytesIO
+from zipfile import ZipFile
+from xml.etree.ElementTree import parse
+
 
 ## 보고서명에 전환사채 또는 전환청구권 단어가 포함된 보고서만 추출
 def collect_report(url, params, page_count):
@@ -52,7 +57,7 @@ def collect_report(url, params, page_count):
     if df.shape[0] > 0:
         ## 2012 교환사채
         df['Tag'] = df['report_nm'].apply(lambda x: '전환청구권행사' if re.search('전환청구권행사', x) is not None else x)
-        df['Tag'] = df['Tag'].apply(lambda x: '전환사채권발행결정' if re.search('전환사채권발행결정|전환사채발행결정|전환사채발행결의', x) is not None else x)
+        df['Tag'] = df['Tag'].apply(lambda x: '전환사채권발행결정' if re.search('전환사채권발행결정|전환사채발행결정|전환사채발행결의|교환사채권발행결정', x) is not None else x)
     else:
         df = pd.DataFrame(columns = ['corp_code', 'corp_name', 'stock_code', 
                                      'corp_cls', 'report_nm', 'rcept_no', 
@@ -94,6 +99,7 @@ def collect_publish_rights(df, publish_rights_URL, driver):
                       '청약일', '납입일(발행예정일)', '전환청구기간시작일', '전환청구기간종료일', '사채만기일', 
                       '최종문서여부', '최종문서여부판단', '정상수집여부', 'url', 'error_log']
     result_publish_rights = pd.DataFrame(columns=result_columns)
+    counts=100
     for elem in range(counts):
         start = time.time()
         print(f'{elem+1} / {counts}')
@@ -195,9 +201,6 @@ def collect_publish_rights(df, publish_rights_URL, driver):
             tmp['정상수집여부'] = '정상'
             print('정상 수집')
             
-            # tmp.iloc[:, :5]
-            # tmp.iloc[:, 5:10]
-            # tmp.iloc[:, 10:15]
 
         except Exception as ex:
             tmp_columns = ['rcept_no', 'corp_code', 'corp_name']
@@ -244,6 +247,7 @@ def collect_exercise_rights(df, exci_rights_URL, driver):
     result_columns = ['rcept_no', 'corp_code', 'corp_name', '회차', '청구일자', '종류', 
                       '청구금액', '전환가액', '발행한 주식수', '상장일 또는 예정일', 
                       '최종문서여부', '최종문서여부판단', '정상수집여부', 'url', 'error_log']
+
     result_exci_rights = pd.DataFrame(columns=result_columns)
     for elem in range(counts):
         start = time.time()
@@ -362,9 +366,3 @@ def check_limit(total_counts, limit, *args):
         raise BreakException()
     print(f'누적 호출 횟수 {total_counts}')
     return total_counts
-
-
-    
-    
-
-
