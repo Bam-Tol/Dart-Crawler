@@ -21,7 +21,7 @@ base_URL = 'https://opendart.fss.or.kr/api/list.json' ## 보고서리스트 url
 publish_rights_URL = 'http://dart.fss.or.kr/dsaf001/main.do' ## 전환사채권발행결정 보고서 url
 exci_rights_URL = 'http://dart.fss.or.kr/dsaf001/main.do' ## 전환청구권행사 보고서 url
 
-crtfc_key = 'ce6cd1b35f397ec5743bc5671e26f2950441bc16' ## 내꺼
+crtfc_key = 'ce6cd1b35f397ec5743bc5671e26f2950441bc16'
 
 ## 드라이버 정의
 driver = webdriver.PhantomJS('C:/chromedriver/phantomjs-2.1.1-windows/bin/phantomjs.exe')
